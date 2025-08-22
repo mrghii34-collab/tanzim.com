@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Main App</title>
+<style>
+body{font-family:sans-serif;background:#020617;color:#e5e7eb;display:grid;place-items:center;height:100vh;margin:0;}
+.card{background:#0b1220;padding:20px;border-radius:12px;width:90%;max-width:400px;text-align:center;}
+input,button{padding:10px;margin:5px;border-radius:6px;border:1px solid #333;width:100%;}
+button{cursor:pointer;}
+a.btn{display:block;text-decoration:none;color:#fff;padding:10px;margin:5px;border-radius:8px;}
+a.watch{background:#3b82f6;} a.download{background:#10b981;}
+.off{color:#fca5a5;background:#1f2937;padding:10px;margin:5px;border-radius:8px;}
+.hide{display:none;}
+</style>
+</head>
+<body>
+<div class="card">
+<!-- Login Page -->
+<div id="pageLogin">
+<h2>Login</h2>
+<div id="offBox" class="off hide"></div>
+<input id="u" type="text" placeholder="Username"><br>
+<input id="p" type="password" placeholder="Password"><br>
+<button onclick="login()">Login</button>
+</div>
+
+<!-- Links Page -->
+<div id="pageLinks" class="hide">
+<h3>Welcome!</h3>
+<a id="watchBtn" class="btn watch" href="#" target="_blank">ভিডিওটি দেখুন</a>
+<a id="dlBtn" class="btn download" href="#" target="_blank">ডাউনলোড</a>
+<button onclick="logout()">Logout</button>
+</div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyCtDWs_Ft0e2NcU-dtwaWPfy-gAXa0azQg",
+  authDomain: "tanzim-main-admin-app.firebaseapp.com",
+  databaseURL: "https://tanzim-main-admin-app-default-rtdb.firebaseio.com",
+  projectId: "tanzim-main-admin-app",
+  storageBucket: "tanzim-main-admin-app.firebasestorage.app",
+  messagingSenderId: "12436676722",
+  appId: "1:12436676722:web:f066ffbc343f0117eea2eb",
+  measurementId: "G-QKK68SK6BN"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+const settingsRef = db.ref('/app/settings');
+
+let liveSettings={};
+
+settingsRef.on('value',snap=>{
+  liveSettings=snap.val()||{};
+  document.getElementById('watchBtn').href=liveSettings.watchLink||'#';
+  document.getElementById('dlBtn').href=liveSettings.downloadLink||'#';
+  const offBox=document.getElementById('offBox');
+  if(!liveSettings.appOn){
+    offBox.textContent=liveSettings.offMsg||'সার্ভিস বন্ধ রয়েছে';
+    offBox.classList.remove('hide');
+  } else {
+    offBox.classList.add('hide');
+  }
+});
+
+// login function
+function login(){
+  const u=document.getElementById('u').value.trim();
+  const p=document.getElementById('p').value;
+  if(!liveSettings.appOn){alert(liveSettings.offMsg||'Service OFF'); return;}
+  if(u===liveSettings.username && p===liveSettings.password){
+    // লুকানো লগইন পেজ
+    document.getElementById('pageLogin').classList.add('hide');
+    // দেখানো লিংক পেজ
+    document.getElementById('pageLinks').classList.remove('hide');
+  } else {alert('ভুল ইউজারনেম বা পাসওয়ার্ড');}
+}
+
+// logout function
+function logout(){
+  document.getElementById('pageLinks').classList.add('hide');
+  document.getElementById('pageLogin').classList.remove('hide');
+  document.getElementById('u').value='';
+  document.getElementById('p').value='';
+}
+</script>
+</body>
+</html>
